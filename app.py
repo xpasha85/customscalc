@@ -25,8 +25,7 @@ FUEL_TYPES = {
     '009': 'Электричество',
 }
 FUTURE_OWNER = [
-    "Физическое лицо (личное пользование)",
-    "Физическое лицо (перепродажа)",
+    "Физическое лицо",
     "Юридическое лицо"
 ]
 CURRENCIES = {
@@ -125,7 +124,7 @@ if st.checkbox('Хочу посчитать машину с Encar'):
             car_displacement = data['vehicle']['spec']['displacement']
             car_type = data['vehicle']['spec']["fuelCd"]
             car_photos_path = data['vehicle']['photos'][0]['path']
-            car_photo = 'https://ci.encar.com/carpicture' + car_photos_path[0:-7] + '001.jpg' +\
+            car_photo = 'https://ci.encar.com/carpicture' + car_photos_path[0:-7] + '001.jpg' + \
                         '?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center '
             if car_type == '009':
                 color = 'green'
@@ -144,7 +143,8 @@ if st.checkbox('Хочу посчитать машину с Encar'):
                 st.write(f"Дата выпуска:&nbsp;&nbsp;&nbsp;:orange[{car_month_word} {car_year}]")
                 formatted_number = f"₩ {car_price:,}"
                 formatted_car_in_rub = "{:,.0f}".format(car_price_in_rub).replace(",", " ")
-                st.write(f"Цена:&nbsp;&nbsp;&nbsp;:orange[{formatted_number}]&nbsp;|&nbsp;:gray[{formatted_car_in_rub} ₽]")
+                st.write(
+                    f"Цена:&nbsp;&nbsp;&nbsp;:orange[{formatted_number}]&nbsp;|&nbsp;:gray[{formatted_car_in_rub} ₽]")
             with col3:
                 st.image(car_photo, width=300)
             # st.write(car_photo)
@@ -164,12 +164,14 @@ if st.checkbox('Хочу посчитать машину с Encar'):
             car_age = data['year']
             is_eligible = data['is_eligible']
             txt = ':green[Автомобиль проходной]' if is_eligible else ':red[Автомобиль непроходной]'
-            #st.write(car_age, type(car_age))
+            # st.write(car_age, type(car_age))
             st.write(txt)
-            calc_is_legal = calculate_customs_clearance(car_price_in_rub, engine_volume, car_age, engine_power, is_electric,
-                                               is_legal_entity, is_commercial, fuel_type, eur_to_rub())
-            calc_not_legal = calculate_customs_clearance(car_price_in_rub, engine_volume, car_age, engine_power, is_electric,
-                                               is_legal_entity, True, fuel_type, eur_to_rub())
+            calc_is_legal = calculate_customs_clearance(car_price_in_rub, engine_volume, car_age, engine_power,
+                                                        is_electric,
+                                                        is_legal_entity, is_commercial, fuel_type, eur_to_rub())
+            calc_not_legal = calculate_customs_clearance(car_price_in_rub, engine_volume, car_age, engine_power,
+                                                         is_electric,
+                                                         is_legal_entity, True, fuel_type, eur_to_rub())
             # formatted_value = "{:,.0f}".format(value).replace(",", " ")
             # st.write(f"{key}&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[ {formatted_value} руб.]")
             customs_clearance = calc_is_legal['Таможенное оформление']
@@ -186,13 +188,14 @@ if st.checkbox('Хочу посчитать машину с Encar'):
             st.write(f'Таможенная пошлина&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{formatted_value} руб.]')
             formatted_value = "{:,.0f}".format(util1).replace(",", " ")
             formatted_value2 = "{:,.0f}".format(util2).replace(",", " ")
-            st.write(f'Утилизационный сбор&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{formatted_value} руб.] / :red[{formatted_value2} руб.]')
+            st.write(
+                f'Утилизационный сбор&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{formatted_value} руб.] / :red[{formatted_value2} руб.]')
             if tax != 0:
                 formatted_value = "{:,.0f}".format(tax).replace(",", " ")
-                st.write(f'Таможенная пошлина&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{tax} руб.]')
+                st.write(f'Акциз&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{formatted_value} руб.]')
             if vat != 0:
-                formatted_value = "{:,.0f}".format(tax).replace(",", " ")
-                st.write(f'Таможенная пошлина&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{vat} руб.]')
+                formatted_value = "{:,.0f}".format(vat).replace(",", " ")
+                st.write(f'НДС&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{formatted_value} руб.]')
             formatted_itog1 = "{:,.0f}".format(summary1).replace(",", " ")
             formatted_itog2 = "{:,.0f}".format(summary2).replace(",", " ")
             st.write(f'Итоговая стоимость растаможки&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green['
@@ -217,9 +220,9 @@ if not is_calc_encar:
                                   'не более одной машины в год;\n- объем двигателя автомобиля не более '
                                   '3 л.\n\nЕсли автомобиль не попадает под критерии личного использования, '
                                   'то применяются повышенные коэффициенты утилизационного сбора')
+        # if owner == FUTURE_OWNER[1]:
+        #     is_commercial = True
         if owner == FUTURE_OWNER[1]:
-            is_commercial = True
-        if owner == FUTURE_OWNER[2]:
             is_legal_entity = True
         # st.write(owner)
         car_year = st.selectbox('Год выпуска авто', [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], 5)
@@ -250,12 +253,42 @@ if not is_calc_encar:
 
         if st.button('Рассчитать'):
             st.write(f':gray[1 EUR - {eur_to_rub()} ₽]')
-
-            data = calculate_customs_clearance(car_price_in_rub, engine_volume, car_age, engine_power, is_electric,
-                                               is_legal_entity, is_commercial, fuel_type, eur_to_rub())
-            # st.write(data)
-            for key, value in data.items():
-                if value == 0:
-                    continue
-                formatted_value = "{:,.0f}".format(value).replace(",", " ")
-                st.write(f"{key}&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[ {formatted_value} руб.]")
+            if owner == FUTURE_OWNER[1]:
+                data = calculate_customs_clearance(car_price_in_rub, engine_volume, car_age, engine_power, is_electric,
+                                                   is_legal_entity, is_commercial, fuel_type, eur_to_rub())
+                for key, value in data.items():
+                    if value == 0:
+                        continue
+                    formatted_value = "{:,.0f}".format(value).replace(",", " ")
+                    st.write(f"{key}&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[ {formatted_value} руб.]")
+            else:
+                data1 = calculate_customs_clearance(car_price_in_rub, engine_volume, car_age, engine_power, is_electric,
+                                                    False, False, fuel_type, eur_to_rub())
+                data2 = calculate_customs_clearance(car_price_in_rub, engine_volume, car_age, engine_power, is_electric,
+                                                    False, True, fuel_type, eur_to_rub())
+                s = data1["Таможенное оформление"]
+                formatted_value = "{:,.0f}".format(s).replace(",", " ")
+                st.write(f"Таможенное оформление&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[ {formatted_value} руб.]")
+                s = data1["Таможенная пошлина"]
+                formatted_value = "{:,.0f}".format(s).replace(",", " ")
+                st.write(f"Таможенная пошлина&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[ {formatted_value} руб.]")
+                s1 = data1["Утилизационный сбор"]
+                s2 = data2["Утилизационный сбор"]
+                formatted_value1 = "{:,.0f}".format(s1).replace(",", " ")
+                formatted_value2 = "{:,.0f}".format(s2).replace(",", " ")
+                st.write(f'Утилизационный сбор&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{formatted_value1} руб.] / '
+                         f':red[{formatted_value2} руб.]')
+                tax = data1["Акциз"]
+                if tax != 0:
+                    formatted_value = "{:,.0f}".format(tax).replace(",", " ")
+                    st.write(f'Акциз&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{formatted_value} руб.]')
+                vat = data1["НДС"]
+                if vat != 0:
+                    formatted_value = "{:,.0f}".format(vat).replace(",", " ")
+                    st.write(f'НДС&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green[{formatted_value} руб.]')
+                s1 = data1["Итоговая стоимость растаможки"]
+                s2 = data2["Итоговая стоимость растаможки"]
+                formatted_value1 = "{:,.0f}".format(s1).replace(",", " ")
+                formatted_value2 = "{:,.0f}".format(s2).replace(",", " ")
+                st.write(f'Итоговая стоимость растаможки&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;:green['
+                         f'{formatted_value1} руб.]  / :red[{formatted_value2} руб.]')
