@@ -10,6 +10,11 @@ hide_menu_style = """
         <style>
         #MainMenu {visibility: hidden;}
         </style>
+        <script>
+        setInterval(function() {
+            fetch(window.location.href);
+        }, 5 * 60 * 1000);
+        </script>
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
